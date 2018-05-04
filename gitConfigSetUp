@@ -1085,3 +1085,15 @@ This file is created with New File in GitHub with
 file name being subject/subFile which will create
 a subdirectory subject under work along the way.
 root@Leon-Ubuntu:/home/leon# 
+
+	===========================================
+If we just want to add one file and push (sync) it to remote GitHub: 
+  652  mv gitConfigSetUp cloneUbuntu/
+  659  git add gitConfigSetUp 
+  660  git commit 
+  662  git push origin<repository> newBranch<refspec> 
+// It will create a new remote newBranch under lfctatung/ubuntu. 
+We can do "Pull Request" on GitHub, which will show diff of 
+this additional file, to merge newBranch into master and 
+delete newBranch afterwards.
+	===========================================
