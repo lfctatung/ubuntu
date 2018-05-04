@@ -1,0 +1,1087 @@
+	--------------------------------------------------
+Difference between "git branch" and"git checkout -b":
+
+"man git-branch" git-branch - List, create, or delete branches
+but it cannot switch to a branch; 
+use "git checkout <newbranch>" to switch to the new branch.
+To create a branch, both can do it:
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch develop	
+// branch develop created, but won't switch to it.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b develop	
+// branch develop created and switches to it immediately which is the same as 
+// git branch develop && git checkout develop
+
+The newly created branch will have a copy of the files as the current branch.
+
+	--------------------------------------------------
+
+If you don't specify a starting point, the new branch is created from what you currently have checked out (the current HEAD) you have switched to.
+
+git-checkout:
+
+    git checkout -b|-B <new_branch> [<start point>]
+
+    Specifying -b causes a new branch to be created as if git-branch(1) were called and then checked out.
+
+git-branch:
+
+    [...] The command’s second form creates a new branch head named <branchname> which points to the current HEAD, or <start-point> if given.
+
+       git branch [--set-upstream | --track | --no-track] [-l] [-f] <branchname> [<start-point>]
+
+You can do either way, doesn't matter which subdirectory you crated a new branch:
+Below it specifies explicitly the branch HEAD or start-point it is based off
+instead of the current branch.
+emily@Emily-Ubuntu:~/git/firstProj$ git branch devBranch2 develop
+emily@Emily-Ubuntu:~/git/firstProj/Dev$ git checkout -b devBranch3 develop Switched to a new branch 'devBranch3'
+emily@Emily-Ubuntu:~/git/firstProj$ git diff devBranch2 devBranch3
+//	No difference above... 
+//	But there is a difference below because devBranch2/3
+//	are based off develop branch which is different from master branch.
+emily@Emily-Ubuntu:~/git/firstProj$ git diff devBranch2 masterBranch 
+emily@Emily-Ubuntu:~/git/firstProj$ git diff develop masterBranch 
+
+Still each Project/repo directory where git init is done 
+cannot see each other's branches that were created with 
+"git commit" and "git checkout/branch" such as: 
+emily@Emily-Ubuntu:~/git$ ls
+cloneProject  firstProj  gitConfigSetUp
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+  checkoutMaster
+  devBranch
+  devBranch2
+  devBranch3
+  develop
+  master
+  masterBranch
+* newBranch
+  newDevelop
+  workBranch
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ cd ..
+emily@Emily-Ubuntu:~/git$ cd cloneProject/
+emily@Emily-Ubuntu:~/git/cloneProject$ git branch masterBranch master
+emily@Emily-Ubuntu:~/git/cloneProject$ git branch -a
+* master
+  masterBranch
+emily@Emily-Ubuntu:~/git/cloneProject$ git checkout masterBranch 
+Switched to branch 'masterBranch'
+emily@Emily-Ubuntu:~/git/cloneProject$ ls
+cloneUbuntu  dOcean
+emily@Emily-Ubuntu:~/git/cloneProject$ ls cloneUbuntu/
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+emily@Emily-Ubuntu:~/git/cloneProject$ 
+
+	--------------------------------------------------
+
+	===========	Summary		==================
+
+See https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository
+
+emily@Emily-Ubuntu:~/git/firstProj$ git init // Per project repository
+emily@Emily-Ubuntu:~/git/firstProj$ git add .
+emily@Emily-Ubuntu:~/git/firstProj$ git add * 
+				  $ git add *.c
+				  $ git add LICENSE
+emily@Emily-Ubuntu:~/git/firstProj$ git commit
+				  $ git commit -m 'initial project version'
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Initial commit" -a(ll)
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Initial commit" file1
+emily@Emily-Ubuntu:~/git/firstProj$ touch dev
+emily@Emily-Ubuntu:~/git/firstProj$ git add dev
+emily@Emily-Ubuntu:~/git/firstProj$ echo "File committed to the \"dev\" branch" >> dev
+emily@Emily-Ubuntu:~/git/firstProj$ cat dev
+File committed to the "dev" branch
+emily@Emily-Ubuntu:~/git/firstProj$ git branch develop	//branch develop created
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+* develop
+  master
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Develop file" dev(filename)
+// After commit, file "dev" is on "develop" branch only, NOT on master any more.
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+  develop
+* master
+emily@Emily-Ubuntu:~/git/firstProj$ git merge develop --no-ff 
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  README.md  Sum.py	
+//	"dev" is now on the master branch as well as develop branch
+
+// Now, you have a Git repository with tracked files and an initial commit.
+// You're going to need to push changes to a remote server. 
+
+emily@Emily-Ubuntu:~/git/firstProj$ git remote add origin https://github.com/lfctatung/ubuntu.git	<<<===
+emily@Emily-Ubuntu:~/git/firstProj$ git remote -v
+emily@Emily-Ubuntu:~/git/firstProj$ git config --list 
+emily@Emily-Ubuntu:~/git/firstProj$ git push(up) -u (to remote server name)origin (remote branch)master	<<<=== to "update remote"
+
+Option 1: Add subdirectory in local master and then push to GitHub
+
+emily@Emily-Ubuntu:~/git/firstProj/work$ git push origin master
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a(ll, plus remote displayed)
+emily@Emily-Ubuntu:~/git/firstProj$ git branch develop	//branch develop created
+// will create "develop" branch if not already exists.
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b develop	// new branch
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+Switched to branch 'develop'				// switch to new branch
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master 
+Switched to branch 'master'
+Your branch is ahead of 'origin/master' by 2 commits.
+  (use "git push" to publish your local commits)
+emily@Emily-Ubuntu:~/git/firstProj$ git push // "update remote"
+// Verified that file "dev" showed up on the GitHub ubuntu/master branch
+
+Meanwhile, we can pull changes from GitHub master to "update local"
+
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
+//	git pull <remote> <branch> 
+//	where branch (master in this case) is the remote source branch
+
+Option 2:	Check out the remote master to local branch checkoutMaster 
+	which is newly created with -b.  See "man git-checkout"
+	Add subdirectory/files in GitHub master and then pull the changes
+	into the local checkoutMaster branch.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b checkoutMaster origin/master Branch checkoutMaster set up to track remote branch master from origin.
+Switched to a new branch 'checkoutMaster'
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout checkoutMaster 
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+emily@Emily-Ubuntu:~/git/firstProj$ git merge checkoutMaster 
+
+//	clone from GitHub ubuntu repo to here and call it "cloneUbuntu"
+
+emily@Emily-Ubuntu:~/git/cloneProject$ git clone https://github.com/lfctatung/ubuntu cloneUbuntu
+Cloning into 'cloneUbuntu'...	
+
+// list all subdirs & files under "/home/emily/git/cloneProject/cloneUbuntu"
+emily@Emily-Ubuntu:~/git/cloneProject$ find cloneUbuntu	
+
+emily@Emily-Ubuntu:~/git/cloneProject$ tar cvf dOcean cloneUbuntu/
+emily@Emily-Ubuntu:~/git/cloneProject$ file dOcean 
+dOcean: POSIX tar archive (GNU)
+emily@Emily-Ubuntu:~/git/cloneProject$ scp dOcean leon@167.99.167.207:/home/leon
+On the DigitalOcean server:
+root@Leon-Ubuntu:/home/leon# tar xvf dOcean 	<<<=== Extract out
+root@Leon-Ubuntu:/home/leon# ls cloneUbuntu/
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+
+	=========== End of	Summary		==================
+
+In GitHub, we have created two projects: hello-world and ubuntu
+
+https://github.com/lfctatung/ubuntu/blob/master/work/subject/subFile
+
+//	GitHub hierarchy: Account lfctatung > Repository(Project) hello-world
+//	and ubuntu > branches (default master) + feature branch which is
+//	deleted after being merged with master.
+//	Each repository can have one or more branches. 
+//	By default, the first branch is called "master".
+
+A repository is usually used to organize a single project. Repositories can contain folders and files, images, videos, spreadsheets, and data sets – anything your project needs. We recommend including a README, or a file with information about your project. GitHub makes it easy to add one at the same time you create your new repository.
+
+By default your repository has one branch named master which is considered to be the definitive branch. We use branches to experiment and make edits before committing them to master.
+
+When you create a branch off the master branch, you’re making a copy, or snapshot, of master as it was at that point in time. If someone else made changes to the master branch while you were working on your branch, you could pull in those updates.
+
+This is my first git project in GitHub. 
+The event sequence is shown below from branching and merging:
+
+    Project "hello-world" with a Master branch and many other feature branches
+    Create Branch out of the Master so that the branch has a snpashot of Master
+    Add or Edit files and Save changes by Commit one file change at a time
+    Pull request for all the changes to that branch into Master and Merge
+    Delete branch as Master now has all the changes made to the branch.
+
+Today is 3-28-2018 and I am following the GitHub tutorial guide for making a change to the README.md file.
+
+Today is 4-29-2018 Sunday, I just finished a DSE Ocean Beach Great Parkway 3 miles run in 31.xx minutes.
+
+We have added a Python and a C code file.
+
+=========================================================================
+
+See https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-14-04#how-to-set-up-git
+
+//	Set up git in local Ubuntu PC
+
+emily@Emily-Ubuntu:~/Documents$ history 10
+  484  sudo apt install git	// failed b/c Unmet Dependencies 
+				// Try 'apt-get -f install' with no packages...
+  486  sudo apt --fix-broken install	// this fixed it!
+  487  sudo apt install git
+  488  which git
+  489  git config --global user.name "lfctatung"
+  491  git config --global user.email "lfctatung@gmail.com"
+  492  git config --list
+user.name=lfctatung
+user.email=lfctatung@gmail.com
+Or
+emily@Emily-Ubuntu:~$ vi /root/.gitconfig // Global git install config
+[user]
+        name = lfctatung
+        email = lfctatung@gmail.com
+
+emily@Emily-Ubuntu:~$ mkdir -p git/firstProj
+emily@Emily-Ubuntu:~$ cd git/firstProj/
+emily@Emily-Ubuntu:~/git/firstProj$ touch file1
+
+//Tell git that you want to use your current directory as a git environment.
+//   init       Create an empty Git repository or reinitialize an existing one
+
+emily@Emily-Ubuntu:~/git/firstProj$ git init // Per project repository
+Initialized empty Git repository in /home/emily/git/firstProj/.git/
+
+emily@Emily-Ubuntu:~/git/firstProj$ ll
+total 12
+drwxrwxr-x 3 emily emily 4096 Apr 28 17:35 ./
+drwxrwxr-x 3 emily emily 4096 Apr 28 17:30 ../
+-rw-rw-r-- 1 emily emily    0 Apr 28 17:32 file1
+drwxrwxr-x 7 emily emily 4096 Apr 28 17:35 .git/ <<<=== Per proj./repository
+emily@Emily-Ubuntu:~/git/firstProj$ ls .git/	 <<<===
+branches  config  description  HEAD  hooks  info  objects  refs
+emily@Emily-Ubuntu:~/git/firstProj$ 
+emily@Emily-Ubuntu:~/git/firstProj$ ll .git/
+total 40
+drwxrwxr-x 7 emily emily 4096 Apr 28 17:38 ./
+drwxrwxr-x 3 emily emily 4096 Apr 28 17:35 ../
+drwxrwxr-x 2 emily emily 4096 Apr 28 17:35 branches/
+-rw-rw-r-- 1 emily emily   92 Apr 28 17:35 config
+-rw-rw-r-- 1 emily emily   73 Apr 28 17:35 description
+-rw-rw-r-- 1 emily emily   23 Apr 28 17:35 HEAD
+drwxrwxr-x 2 emily emily 4096 Apr 28 17:35 hooks/
+drwxrwxr-x 2 emily emily 4096 Apr 28 17:35 info/
+drwxrwxr-x 4 emily emily 4096 Apr 28 17:35 objects/
+drwxrwxr-x 4 emily emily 4096 Apr 28 17:35 refs/
+
+emily@Emily-Ubuntu:~/git/firstProj$ cat .git/HEAD 
+ref: refs/heads/master
+emily@Emily-Ubuntu:~/git/firstProj$ cat .git/config //	Proj. level
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+
+emily@Emily-Ubuntu:~/git/firstProj$ cat .git/description 
+Unnamed repository; edit this file 'description' to name the repository.
+
+//Once your have initialized your new empty repository, you can add your files.
+//	The following will add all files and directories to your 
+//	newly created repository:
+//	%man git-add: It updates the index using the current content found in
+       the working tree, to prepare the content staged for the next
+       commit. It typically adds the current content of existing paths as
+       a whole.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git add .
+emily@Emily-Ubuntu:~/git/firstProj$ 
+
+//Every time you make changes to files, you need to write a commit message.
+//   %man git-commit:     Record changes to the repository
+//	The -a signifies that we want our commit message 
+//	to be applied to all added or modified files.
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Initial commit" -a(ll)
+[master (root-commit) a328468] Initial commit
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 file1
+emily@Emily-Ubuntu:~/git/firstProj$ 
+
+//			or individual files seperated by space
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Initial commit" file1
+On branch master
+nothing to commit, working directory clean
+
+emily@Emily-Ubuntu:~/git/firstProj$ echo "#Ubuntu" >>README.md
+emily@Emily-Ubuntu:~/git/firstProj$ cat README.md 
+#Ubuntu
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+file1  README.md  Sum.py
+emily@Emily-Ubuntu:~/git/firstProj$ git init	//	Reinitialized
+Reinitialized existing Git repository in /home/emily/git/firstProj/.git/
+emily@Emily-Ubuntu:~/git/firstProj$ git add * 
+emily@Emily-Ubuntu:~/git/firstProj$ git commit
+[master c893952] First commit
+ 3 files changed, 13 insertions(+)
+ create mode 100644 README.md
+ create mode 100644 Sum.py
+
+///////////////////////////////////////////////////////////////////
+//	Up until this point, we have done everything on our local server.
+//	If you want to work with a team of developers, however, 
+//	you're going to need to push changes to a remote server. 
+///////////////////////////////////////////////////////////////////
+
+See pictures/GitHub_RemoteSetUp.png
+
+It adds a remote, called "origin", and sets the URL to ssh://git@gitHub.com/repository.git. You can name your remote whatever you'd like, but the URL needs to point to an actual remote repository. For example, if you wanted to push code to GitHub, you would need to use the repository URL that they provide.
+
+Note: We need to set up a repository/project ubuntu beforehand.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git remote add origin https://github.com/lfctatung/ubuntu.git	<<<===
+
+//	set-url for ssh to origin
+//	git remote set-url origin (ssh://)git@github.com:lfctatung/ubuntu.git
+                                  ============
+
+emily@Emily-Ubuntu:~/git/firstProj$ git config --list //	Proj. level
+user.name=lfctatung		//	inherited from global level ~/git
+user.email=lfctatung@gmail.com	//	inherited from global level ~/git
+
+core.repositoryformatversion=0	//	Below are Proj. repo. level
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+
+remote.dOcean.url=https://github.com/lfctatung/
+remote.dOcean.fetch=+refs/heads/*:refs/remotes/dOcean/*
+remote.origin.url=git@github.com:lfctatung/ubuntu.git		<<<===
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+
+//	set-url for https to origin
+//	git remote set-url origin https://github.com/lfctatung/ubuntu.git
+ 				  ========
+emily@Emily-Ubuntu:~/git/firstProj$ git config --list 
+user.name=lfctatung
+user.email=lfctatung@gmail.com
+core.repositoryformatversion=0	//	Below are Proj. repo. level
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.dOcean.url=https://github.com/lfctatung/
+remote.dOcean.fetch=+refs/heads/*:refs/remotes/dOcean/*
+remote.origin.url=https://github.com/lfctatung/ubuntu.git	<<<===
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.master.remote=origin
+branch.master.merge=refs/heads/master
+///////////////////////////////////////////////////////////////////
+
+// See emily@Emily-Ubuntu:~/git/firstProj$ git push --help
+Once you have a remote configured, you are now able to push your code.
+"git push" tells git that we want to push our changes, "origin" is the name of our newly-configured remote server and "master" is the name of the first branch.
+In the future, when you have commits that you want to push to the server, you can simply type "git push".
+emily@Emily-Ubuntu:~/git/firstProj$ git push(up) -u (to remote server name)origin (remote branch)master	<<<===
+
+//	user.name=lfctatung; inherited from global level ~/git
+Username for 'https://github.com': lfctatung
+Password for 'https://lfctatung@github.com': 
+Counting objects: 8, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (8/8), 703 bytes | 0 bytes/s, done.
+Total 8 (delta 0), reused 0 (delta 0)
+To https://github.com/lfctatung/ubuntu.git
+ * [new branch]      master -> master
+Branch master set up to track remote branch master from origin.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git remote -v
+dOcean	https://github.com/lfctatung/ (fetch)
+dOcean	https://github.com/lfctatung/ (push)
+origin	https://github.com/lfctatung/ubuntu.git (fetch)
+origin	https://github.com/lfctatung/ubuntu.git (push)
+
+	=================	Branches	================
+See
+https://www.digitalocean.com/community/tutorials/how-to-use-git-branches
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch --help
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a(ll, including remote)
+* master	//	* = current branch
+  remotes/origin/master
+
+The command’s second form creates a new branch head named <branchname>
+       which points to the current HEAD, or <start-point> if given.
+
+       Note that this will create the new branch, but it will not switch the
+       working tree to it; use "git checkout <newbranch>" to switch to the new
+       branch.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git branch develop	//branch develop created
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+Switched to branch 'develop'
+emily@Emily-Ubuntu:~/git/firstProj$ pwd
+/home/emily/git/firstProj
+// will create "develop" branch if not already exists.
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b develop
+fatal: A branch named 'develop' already exists.
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -B develop 
+Reset branch 'develop'
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master 
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+Switched to branch 'develop'
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+* develop
+  master
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ touch dev
+emily@Emily-Ubuntu:~/git/firstProj$ ll
+total 24
+drwxrwxr-x 3 emily emily 4096 Apr 30 19:29 ./
+drwxrwxr-x 3 emily emily 4096 Apr 30 19:16 ../
+-rw-rw-r-- 1 emily emily    0 Apr 30 19:29 dev	<<== created under firstProj
+-rw-rw-r-- 1 emily emily   36 Apr 29 17:27 file1
+drwxrwxr-x 8 emily emily 4096 Apr 30 19:27 .git/
+-rw-rw-r-- 1 emily emily    8 Apr 30 11:45 README.md
+-rw-rw-r-- 1 emily emily  276 Apr 29 15:04 Sum.py
+
+emily@Emily-Ubuntu:~/git/firstProj$ git add dev
+emily@Emily-Ubuntu:~/git/firstProj$ ll
+total 24
+drwxrwxr-x 3 emily emily 4096 Apr 30 19:29 ./
+drwxrwxr-x 3 emily emily 4096 Apr 30 19:16 ../
+-rw-rw-r-- 1 emily emily    0 Apr 30 19:29 dev	//	still in firstProj
+-rw-rw-r-- 1 emily emily   36 Apr 29 17:27 file1
+drwxrwxr-x 8 emily emily 4096 Apr 30 19:31 .git/
+-rw-rw-r-- 1 emily emily    8 Apr 30 11:45 README.md
+-rw-rw-r-- 1 emily emily  276 Apr 29 15:04 Sum.py
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+Switched to branch 'develop'
+emily@Emily-Ubuntu:~/git/firstProj$ echo "File committed to the \"dev\" branch" >> dev
+emily@Emily-Ubuntu:~/git/firstProj$ cat dev
+File committed to the "dev" branch
+emily@Emily-Ubuntu:~/git/firstProj$ git commit -m "Develop file" dev(filename)
+[develop 2bd70f5] Develop file
+ 1 file changed, 1 insertion(+)
+ create mode 100644 dev
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+* develop
+  master
+
+// After commit, file "dev" is on develop branch only, NOT on master any more.
+
+emily@Emily-Ubuntu:~/git/firstProj$ ls	
+dev  file1  README.md  Sum.py	//	"dev" is on the develop branch
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+  develop
+* master
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+file1  README.md  Sum.py	//	"dev" is NOT on the master branch
+emily@Emily-Ubuntu:~/git/firstProj$ 
+emily@Emily-Ubuntu:~/git/firstProj$ git merge develop --no-ff 
+Merge made by the 'recursive' strategy.
+ dev | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 dev
+emily@Emily-Ubuntu:~/git/firstProj$ cat .git/COMMIT_EDITMSG 
+Develop file
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  README.md  Sum.py	//	"dev" is now on the master branch
+emily@Emily-Ubuntu:~/git/firstProj$ 
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop
+Switched to branch 'develop'
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  README.md  Sum.py	//	"dev" is still on the develop branch
+emily@Emily-Ubuntu:~/git/firstProj$ 
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master 
+Switched to branch 'master'
+Your branch is ahead of 'origin/master' by 2 commits.
+  (use "git push" to publish your local commits)
+emily@Emily-Ubuntu:~/git/firstProj$ git push
+warning: push.default is unset; its implicit value has changed in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the traditional behavior, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+When push.default is set to 'matching', git will push local branches
+to the remote branches that already exist with the same name.
+
+Since Git 2.0, Git defaults to the more conservative 'simple'
+behavior, which only pushes the current branch to the corresponding
+remote branch that 'git pull' uses to update the current branch.
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': lfctatung
+Password for 'https://lfctatung@github.com': 
+Counting objects: 4, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 461 bytes | 0 bytes/s, done.
+Total 4 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), done.
+To https://github.com/lfctatung/ubuntu.git
+   c893952..020ac9a  master -> master	// local master to remote master
+emily@Emily-Ubuntu:~/git/firstProj$ 
+// Verified that file "dev" showed up on the GitHub ubuntu/master branch
+
+	In summary, the procedure is like this
+Local
+  677  python sumPosTuple.py
+  678  git branch 	//	in develop branch
+  679  git diff
+  680  git add sumPosTuple.py	//	add to local develop branch (edput)
+  681  ls
+  682  git commit sumPosTuple.py 	//	in develop branch
+  683  ls
+  684  git checkout master	//	switch to master (changeview)
+  685  ls
+  686  git merge develop //	develop is merged with local master
+  687  ls
+  688  git push	// to sync with remote master
+
+
+// Pull and Push are network commands to work with remote repository and branch
+
+Suppose we created/committed a file gitPull.txt on GitHub repo: ubuntu master.
+We want to download to our local develop branch...
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout develop 
+Switched to branch 'develop'
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+* develop
+  master
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
+//	git pull <remote> <branch> 
+//	where branch (master in this case) is the remote source branch
+From https://github.com/lfctatung/ubuntu
+ * branch            master     -> FETCH_HEAD
+Updating 7f2519e..02557fa
+Fast-forward
+ gitPull.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 gitPull.txt
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py
+	=================
+
+Or we can do in two steps: fetch and merge. We will do it to our local master:
+
+emily@Emily-Ubuntu:~/git/firstProj$ git fetch origin 	//	fetch
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From https://github.com/lfctatung/ubuntu
+   97d53ca..02557fa  master     -> origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  README.md  sumPosTuple.py  Sum.py
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master 
+Switched to branch 'master'
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+  develop
+* master
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  README.md  sumPosTuple.py  Sum.py
+emily@Emily-Ubuntu:~/git/firstProj$ git merge		//	merge
+Updating 97d53ca..02557fa
+Fast-forward
+ gitPull.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 gitPull.txt
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py
+	=================
+
+Instead of using clone, we can use checkout to download a single branch.
+You can't add an empty directory to git. The workaround is to add 
+an empty file and add it to git:
+
+	-----------------------------------------------------
+Option 1: Add subdirectory in local master and then push to GitHub
+	-----------------------------------------------------
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+emily@Emily-Ubuntu:~/git/firstProj$ git branch 
+  checkoutMaster
+  develop
+* master
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py
+emily@Emily-Ubuntu:~/git/firstProj$ mkdir work && cd work && touch file1 file2
+emily@Emily-Ubuntu:~/git/firstProj/work$ ls
+file1  file2
+emily@Emily-Ubuntu:~/git/firstProj/work$ pwd
+/home/emily/git/firstProj/work
+emily@Emily-Ubuntu:~/git/firstProj/work$ git add . && git commit -m "Add file1 file2 to subdirectory work"
+[master 8c242ab] Add file1 file2 to subdirectory work
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 work/file1
+ create mode 100644 work/file2
+emily@Emily-Ubuntu:~/git/firstProj/work$ vi file1
+emily@Emily-Ubuntu:~/git/firstProj/work$ cp file1 file2
+emily@Emily-Ubuntu:~/git/firstProj/work$ vi file2
+emily@Emily-Ubuntu:~/git/firstProj/work$ diff file1 file2
+1c1
+< This is file1 under work directory.
+---
+> This is file2 under work directory.
+emily@Emily-Ubuntu:~/git/firstProj/work$  git commit -m "Add contents to file1 file2 to subdirectory work"
+On branch master
+Your branch is ahead of 'origin/master' by 1 commit.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+	modified:   file1
+	modified:   file2
+
+no changes added to commit
+emily@Emily-Ubuntu:~/git/firstProj/work$ git push origin master
+Username for 'https://github.com': lfctatung
+Password for 'https://lfctatung@github.com': 
+Counting objects: 4, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (4/4), 328 bytes | 0 bytes/s, done.
+Total 4 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/lfctatung/ubuntu.git
+   02557fa..8c242ab  master -> master
+emily@Emily-Ubuntu:~/git/firstProj/work$ git add . && git commit -m "Add contents to file1 file2 in subdirectory work"
+[master 2bc2700] Add contents to file1 file2 in subdirectory work
+ 2 files changed, 2 insertions(+)
+emily@Emily-Ubuntu:~/git/firstProj/work$ git push origin master
+Username for 'https://github.com': lfctatung
+Password for 'https://lfctatung@github.com': 
+Counting objects: 5, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (5/5), 425 bytes | 0 bytes/s, done.
+Total 5 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/lfctatung/ubuntu.git
+   8c242ab..2bc2700  master -> master
+emily@Emily-Ubuntu:~/git/firstProj/work$ git branch -a
+  checkoutMaster
+  develop
+* master
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj/work$ 
+
+	-----------------------------------------------------
+Option 2:	Check out the remote master to local branch checkoutMaster 
+	which is newly created with -b.  See "man git-checkout"
+	Add subdirectory/files in GitHub master and then pull the changes
+	into the local checkoutMaster branch.
+	-----------------------------------------------------
+Below we first create a clone checkoutMaster in local to checkout the
+GitHub master branch:
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b checkoutMaster origin/master Branch checkoutMaster set up to track remote branch master from origin.
+Switched to a new branch 'checkoutMaster'
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+* checkoutMaster
+  develop
+  master
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py
+
+emily@Emily-Ubuntu:~/git/firstProj/work$ git checkout checkoutMaster 
+Switched to branch 'checkoutMaster'
+Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+emily@Emily-Ubuntu:~/git/firstProj/work$ ls
+emily@Emily-Ubuntu:~/git/firstProj/work$ cd ..
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+* checkoutMaster
+  develop
+  master
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
+remote: Counting objects: 5, done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 5 (delta 1), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (5/5), done.
+From https://github.com/lfctatung/ubuntu
+ * branch            master     -> FETCH_HEAD
+   2bc2700..96289b9  master     -> origin/master
+Updating 02557fa..96289b9
+Fast-forward
+ work/file1           | 1 +
+ work/file2           | 1 +
+ work/subject/subFile | 3 +++
+ 3 files changed, 5 insertions(+)
+ create mode 100644 work/file1
+ create mode 100644 work/file2
+ create mode 100644 work/subject/subFile
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+emily@Emily-Ubuntu:~/git/firstProj$ ls work
+file1  file2  subject
+emily@Emily-Ubuntu:~/git/firstProj$ ls work/subject/
+subFile
+emily@Emily-Ubuntu:~/git/firstProj$ cat work/subject/subFile 
+This file is created with New File in GitHub with 
+file name being subject/subFile which will create
+a subdirectory subject under work along the way.
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+* checkoutMaster
+  develop
+  master
+  remotes/origin/master
+
+emily@Emily-Ubuntu:~/git/firstProj$ man git-merge
+//	Since the local master is behind checkoutMaster, 
+//	we will changeview to the master and git merge to sync.
+//	Alternatively, we can git pull it directly from origin master.
+
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+Switched to branch 'master'
+Your branch is behind 'origin/master' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+emily@Emily-Ubuntu:~/git/firstProj$ ls
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+  checkoutMaster
+  develop
+* master
+  remotes/origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ ls work
+file1  file2
+emily@Emily-Ubuntu:~/git/firstProj$ git merge checkoutMaster 
+Updating 2bc2700..96289b9
+Fast-forward
+ work/subject/subFile | 3 +++
+ 1 file changed, 3 insertions(+)
+ create mode 100644 work/subject/subFile
+emily@Emily-Ubuntu:~/git/firstProj$ ls work
+file1  file2  subject
+emily@Emily-Ubuntu:~/git/firstProj$ ls work/subject/
+subFile
+emily@Emily-Ubuntu:~/git/firstProj$ 
+
+	====================================================
+	We can clone a repo directory from GitHub to local
+	====================================================
+
+emily@Emily-Ubuntu:~/git$ mkdir cloneProject	//	make a local dir.
+emily@Emily-Ubuntu:~/git$ cd cloneProject/
+emily@Emily-Ubuntu:~/git/cloneProject$ git init	//	init cloneProject
+Initialized empty Git repository in /home/emily/git/cloneProject/.git/
+emily@Emily-Ubuntu:~/git/cloneProject$ ll
+total 12
+drwxrwxr-x 3 emily emily 4096 May  3 14:54 ./
+drwxrwxr-x 4 emily emily 4096 May  3 14:53 ../
+drwxrwxr-x 7 emily emily 4096 May  3 14:54 .git/
+
+//	clone from GitHub ubuntu repo to here and call it "cloneUbuntu"
+
+emily@Emily-Ubuntu:~/git/cloneProject$ git clone https://github.com/lfctatung/ubuntu cloneUbuntu
+Cloning into 'cloneUbuntu'...
+remote: Counting objects: 32, done.
+remote: Compressing objects: 100% (20/20), done.
+remote: Total 32 (delta 9), reused 20 (delta 4), pack-reused 0
+Unpacking objects: 100% (32/32), done.
+Checking connectivity... done.
+
+//	Verify they are cloned here under cloneUbuntu...
+emily@Emily-Ubuntu:~/git/cloneProject$ ls cloneUbuntu/
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+emily@Emily-Ubuntu:~/git/cloneProject$ ls cloneUbuntu/work/
+file1  file2  subject
+emily@Emily-Ubuntu:~/git/cloneProject$ ls cloneUbuntu/work/subject/
+subFile
+emily@Emily-Ubuntu:~/git/cloneProject$ cat cloneUbuntu/work/subject/subFile 
+This file is created with New File in GitHub with 
+file name being subject/subFile which will create
+a subdirectory subject under work along the way.
+emily@Emily-Ubuntu:~/git/cloneProject$ find cloneUbuntu/
+cloneUbuntu/
+cloneUbuntu/sumPosTuple.py
+cloneUbuntu/README.md
+cloneUbuntu/work
+cloneUbuntu/work/file2
+cloneUbuntu/work/file1
+cloneUbuntu/work/subject
+cloneUbuntu/work/subject/subFile
+cloneUbuntu/Sum.py
+cloneUbuntu/gitPull.txt
+cloneUbuntu/.git
+cloneUbuntu/.git/hooks
+cloneUbuntu/.git/hooks/post-update.sample
+cloneUbuntu/.git/hooks/pre-push.sample
+cloneUbuntu/.git/hooks/update.sample
+cloneUbuntu/.git/hooks/pre-commit.sample
+cloneUbuntu/.git/hooks/pre-rebase.sample
+cloneUbuntu/.git/hooks/prepare-commit-msg.sample
+cloneUbuntu/.git/hooks/pre-applypatch.sample
+cloneUbuntu/.git/hooks/applypatch-msg.sample
+cloneUbuntu/.git/hooks/commit-msg.sample
+cloneUbuntu/.git/index
+cloneUbuntu/.git/logs
+cloneUbuntu/.git/logs/HEAD
+cloneUbuntu/.git/logs/refs
+cloneUbuntu/.git/logs/refs/heads
+cloneUbuntu/.git/logs/refs/heads/master
+cloneUbuntu/.git/logs/refs/remotes
+cloneUbuntu/.git/logs/refs/remotes/origin
+cloneUbuntu/.git/logs/refs/remotes/origin/HEAD
+cloneUbuntu/.git/packed-refs
+cloneUbuntu/.git/HEAD
+cloneUbuntu/.git/branches
+cloneUbuntu/.git/info
+cloneUbuntu/.git/info/exclude
+cloneUbuntu/.git/objects
+cloneUbuntu/.git/objects/ba
+cloneUbuntu/.git/objects/ba/1ffb5300d89e4597a26763512e743b7d4f959b
+cloneUbuntu/.git/objects/92
+cloneUbuntu/.git/objects/92/14c83174e839e26bb5576efb1860f2567b3510
+cloneUbuntu/.git/objects/a3
+cloneUbuntu/.git/objects/a3/284685fc5618f3f21d20c535c54e9928e685a7
+cloneUbuntu/.git/objects/54
+cloneUbuntu/.git/objects/54/9c7e84fa05c985f40fc58a93cd30df1e5c6f75
+cloneUbuntu/.git/objects/54/51d4a2dc1c88f292fd3a56470154aa6b4af17c
+cloneUbuntu/.git/objects/94
+cloneUbuntu/.git/objects/94/25c42b3a440ce6dbc141ac95085b41e6894e5a
+cloneUbuntu/.git/objects/d0
+cloneUbuntu/.git/objects/d0/9cbc328969610c755270a4a232c0453d15d75c
+cloneUbuntu/.git/objects/4a
+cloneUbuntu/.git/objects/4a/8d8ca861ca496500c29a88a6f51d8596b68fd3
+cloneUbuntu/.git/objects/97
+cloneUbuntu/.git/objects/97/d53ca86f05f19ebf1d0dae5314d32949b89bba
+cloneUbuntu/.git/objects/31
+cloneUbuntu/.git/objects/31/ec7112678d6239b250cf982586acb714157995
+cloneUbuntu/.git/objects/93
+cloneUbuntu/.git/objects/93/12f8209c797b1502cb9fea3f8aab56d9ed241b
+cloneUbuntu/.git/objects/1d
+cloneUbuntu/.git/objects/1d/dc8c866b79fd0bfad77f2cb33ad763ac25cfc3
+cloneUbuntu/.git/objects/9c
+cloneUbuntu/.git/objects/9c/dd8f20c14700b1490d26e189c97c3c4febda66
+cloneUbuntu/.git/objects/2b
+cloneUbuntu/.git/objects/2b/d70f55ca70bfb89aae3276e99bf7340b0b711f
+cloneUbuntu/.git/objects/2b/c2700494543121bf039e435051134774cb4b9b
+cloneUbuntu/.git/objects/pack
+cloneUbuntu/.git/objects/7f
+cloneUbuntu/.git/objects/7f/2519ec2eda5ef1f423631173c0df0e51060dad
+cloneUbuntu/.git/objects/f7
+cloneUbuntu/.git/objects/f7/10deaf1c678ac6718d4bb2d4651ba4a070ef9e
+cloneUbuntu/.git/objects/96
+cloneUbuntu/.git/objects/96/289b97bae0a70e2a878d2787d99672db385179
+cloneUbuntu/.git/objects/1e
+cloneUbuntu/.git/objects/1e/2e4b11c5d45af0ce69c3c4e9c6049d4fbacb24
+cloneUbuntu/.git/objects/info
+cloneUbuntu/.git/objects/ad
+cloneUbuntu/.git/objects/ad/24149d789e59d4b5f9ce41cda90110ca0f98b7
+cloneUbuntu/.git/objects/5c
+cloneUbuntu/.git/objects/5c/444f7945a9ccf8e182ca86e67cf686e0bd255e
+cloneUbuntu/.git/objects/1a
+cloneUbuntu/.git/objects/1a/6f2a7da5d1d67f53bc8372b6f7c2b0bc5adaea
+cloneUbuntu/.git/objects/cc
+cloneUbuntu/.git/objects/cc/a81f035455adbefbdcc5a733c14899f74f4680
+cloneUbuntu/.git/objects/ae
+cloneUbuntu/.git/objects/ae/fde3a01f6e10d72fd4899ce14c8b2654d3eb45
+cloneUbuntu/.git/objects/8c
+cloneUbuntu/.git/objects/8c/242ab5bc292d94d610e8be29a0c5729fdbf5db
+cloneUbuntu/.git/objects/c8
+cloneUbuntu/.git/objects/c8/939527c8d55c93e444f7c00db4986aec1d97e2
+cloneUbuntu/.git/objects/02
+cloneUbuntu/.git/objects/02/557fa400393c2b8ccccff8564290a1ab1f355c
+cloneUbuntu/.git/objects/02/0ac9ae13b996da9b3f29cd5cf501784040a2b3
+cloneUbuntu/.git/objects/33
+cloneUbuntu/.git/objects/33/2a47d6f81fb7b624e164c31eba8c34f861ceb6
+cloneUbuntu/.git/objects/22
+cloneUbuntu/.git/objects/22/42fd0657a6ad5194d757f73e97e8384631f8d7
+cloneUbuntu/.git/objects/ce
+cloneUbuntu/.git/objects/ce/b0e4c9be6bf8271d8db955e5313e09de957faf
+cloneUbuntu/.git/objects/e6
+cloneUbuntu/.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+cloneUbuntu/.git/config
+cloneUbuntu/.git/refs
+cloneUbuntu/.git/refs/tags
+cloneUbuntu/.git/refs/heads
+cloneUbuntu/.git/refs/heads/master
+cloneUbuntu/.git/refs/remotes
+cloneUbuntu/.git/refs/remotes/origin
+cloneUbuntu/.git/refs/remotes/origin/HEAD
+cloneUbuntu/.git/description
+cloneUbuntu/dev
+cloneUbuntu/file1
+emily@Emily-Ubuntu:~/git/cloneProject$ 
+
+	-------------------------------------------
+Notice that there is no branch including master yet until we do 
+git add and git commit even though we have done git init:
+emily@Emily-Ubuntu:~/git/cloneProject$ ls
+cloneUbuntu  dOcean
+emily@Emily-Ubuntu:~/git/cloneProject$ ls cloneUbuntu/
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+emily@Emily-Ubuntu:~/git/cloneProject$ git add .
+emily@Emily-Ubuntu:~/git/cloneProject$ git branch -a	// NO master yet
+emily@Emily-Ubuntu:~/git/cloneProject$ git commit -m 'cloneProject commit'
+[master (root-commit) 73e20d0] cloneProject commit
+ 2 files changed, 1 insertion(+)
+ create mode 160000 cloneUbuntu
+ create mode 100644 dOcean
+emily@Emily-Ubuntu:~/git/cloneProject$ git branch -a
+* master	// Now master is there.
+	-------------------------------------------
+
+//	We will tar cloneUbuntu dir. into a tar file called dOcean
+//	and scp it to DigitalOcean server and verified it by extracting
+//	it with untar.
+
+emily@Emily-Ubuntu:~/git/cloneProject$ tar cvf dOcean cloneUbuntu/
+emily@Emily-Ubuntu:~/git/cloneProject$ ls
+cloneUbuntu  dOcean
+emily@Emily-Ubuntu:~/git/cloneProject$ file dOcean 
+dOcean: POSIX tar archive (GNU)
+
+emily@Emily-Ubuntu:~/git/cloneProject$ scp dOcean leon@167.99.167.207:/home/leon
+leon@167.99.167.207's password: 
+dOcean                                   100%  100KB 100.0KB/s   00:00    
+emily@Emily-Ubuntu:~/git/cloneProject$ 
+
+On the DigitalOcean server:
+root@Leon-Ubuntu:/home/leon# ll
+total 132
+drwxrwxr-x 3 leon leon   4096 May  4 02:09 ./
+drwxr-xr-x 3 root root   4096 Apr 12 19:01 ../
+-rw------- 1 leon leon    862 Apr 12 21:09 .bash_history
+-rw-r--r-- 1 leon leon    220 Aug 31  2015 .bash_logout
+-rw-r--r-- 1 leon leon   3771 Aug 31  2015 .bashrc
+drwx------ 2 leon leon   4096 May  3 23:02 .cache/
+-rw-r--r-- 1 leon leon      0 Apr 10 23:35 .cloud-locale-test.skip
+-rw-rw-r-- 1 leon leon 102400 May  4 02:09 dOcean	<<<=== scp'ed over 
+-rw-r--r-- 1 leon leon    655 May 16  2017 .profile
+-rw-r--r-- 1 leon leon      0 Apr 12 19:25 .sudo_as_admin_successful
+-rw------- 1 leon leon   2098 Apr 12 20:59 .viminfo
+root@Leon-Ubuntu:/home/leon# tar xvf dOcean 	<<<=== Extract out
+cloneUbuntu/
+cloneUbuntu/sumPosTuple.py
+cloneUbuntu/README.md
+cloneUbuntu/work/
+cloneUbuntu/work/file2
+cloneUbuntu/work/file1
+cloneUbuntu/work/subject/
+cloneUbuntu/work/subject/subFile
+cloneUbuntu/Sum.py
+cloneUbuntu/gitPull.txt
+cloneUbuntu/.git/
+cloneUbuntu/.git/hooks/
+cloneUbuntu/.git/hooks/post-update.sample
+cloneUbuntu/.git/hooks/pre-push.sample
+cloneUbuntu/.git/hooks/update.sample
+cloneUbuntu/.git/hooks/pre-commit.sample
+cloneUbuntu/.git/hooks/pre-rebase.sample
+cloneUbuntu/.git/hooks/prepare-commit-msg.sample
+cloneUbuntu/.git/hooks/pre-applypatch.sample
+cloneUbuntu/.git/hooks/applypatch-msg.sample
+cloneUbuntu/.git/hooks/commit-msg.sample
+cloneUbuntu/.git/index
+cloneUbuntu/.git/logs/
+cloneUbuntu/.git/logs/HEAD
+cloneUbuntu/.git/logs/refs/
+cloneUbuntu/.git/logs/refs/heads/
+cloneUbuntu/.git/logs/refs/heads/master
+cloneUbuntu/.git/logs/refs/remotes/
+cloneUbuntu/.git/logs/refs/remotes/origin/
+cloneUbuntu/.git/logs/refs/remotes/origin/HEAD
+cloneUbuntu/.git/packed-refs
+cloneUbuntu/.git/HEAD
+cloneUbuntu/.git/branches/
+cloneUbuntu/.git/info/
+cloneUbuntu/.git/info/exclude
+cloneUbuntu/.git/objects/
+cloneUbuntu/.git/objects/ba/
+cloneUbuntu/.git/objects/ba/1ffb5300d89e4597a26763512e743b7d4f959b
+cloneUbuntu/.git/objects/92/
+cloneUbuntu/.git/objects/92/14c83174e839e26bb5576efb1860f2567b3510
+cloneUbuntu/.git/objects/a3/
+cloneUbuntu/.git/objects/a3/284685fc5618f3f21d20c535c54e9928e685a7
+cloneUbuntu/.git/objects/54/
+cloneUbuntu/.git/objects/54/9c7e84fa05c985f40fc58a93cd30df1e5c6f75
+cloneUbuntu/.git/objects/54/51d4a2dc1c88f292fd3a56470154aa6b4af17c
+cloneUbuntu/.git/objects/94/
+cloneUbuntu/.git/objects/94/25c42b3a440ce6dbc141ac95085b41e6894e5a
+cloneUbuntu/.git/objects/d0/
+cloneUbuntu/.git/objects/d0/9cbc328969610c755270a4a232c0453d15d75c
+cloneUbuntu/.git/objects/4a/
+cloneUbuntu/.git/objects/4a/8d8ca861ca496500c29a88a6f51d8596b68fd3
+cloneUbuntu/.git/objects/97/
+cloneUbuntu/.git/objects/97/d53ca86f05f19ebf1d0dae5314d32949b89bba
+cloneUbuntu/.git/objects/31/
+cloneUbuntu/.git/objects/31/ec7112678d6239b250cf982586acb714157995
+cloneUbuntu/.git/objects/93/
+cloneUbuntu/.git/objects/93/12f8209c797b1502cb9fea3f8aab56d9ed241b
+cloneUbuntu/.git/objects/1d/
+cloneUbuntu/.git/objects/1d/dc8c866b79fd0bfad77f2cb33ad763ac25cfc3
+cloneUbuntu/.git/objects/9c/
+cloneUbuntu/.git/objects/9c/dd8f20c14700b1490d26e189c97c3c4febda66
+cloneUbuntu/.git/objects/2b/
+cloneUbuntu/.git/objects/2b/d70f55ca70bfb89aae3276e99bf7340b0b711f
+cloneUbuntu/.git/objects/2b/c2700494543121bf039e435051134774cb4b9b
+cloneUbuntu/.git/objects/pack/
+cloneUbuntu/.git/objects/7f/
+cloneUbuntu/.git/objects/7f/2519ec2eda5ef1f423631173c0df0e51060dad
+cloneUbuntu/.git/objects/f7/
+cloneUbuntu/.git/objects/f7/10deaf1c678ac6718d4bb2d4651ba4a070ef9e
+cloneUbuntu/.git/objects/96/
+cloneUbuntu/.git/objects/96/289b97bae0a70e2a878d2787d99672db385179
+cloneUbuntu/.git/objects/1e/
+cloneUbuntu/.git/objects/1e/2e4b11c5d45af0ce69c3c4e9c6049d4fbacb24
+cloneUbuntu/.git/objects/info/
+cloneUbuntu/.git/objects/ad/
+cloneUbuntu/.git/objects/ad/24149d789e59d4b5f9ce41cda90110ca0f98b7
+cloneUbuntu/.git/objects/5c/
+cloneUbuntu/.git/objects/5c/444f7945a9ccf8e182ca86e67cf686e0bd255e
+cloneUbuntu/.git/objects/1a/
+cloneUbuntu/.git/objects/1a/6f2a7da5d1d67f53bc8372b6f7c2b0bc5adaea
+cloneUbuntu/.git/objects/cc/
+cloneUbuntu/.git/objects/cc/a81f035455adbefbdcc5a733c14899f74f4680
+cloneUbuntu/.git/objects/ae/
+cloneUbuntu/.git/objects/ae/fde3a01f6e10d72fd4899ce14c8b2654d3eb45
+cloneUbuntu/.git/objects/8c/
+cloneUbuntu/.git/objects/8c/242ab5bc292d94d610e8be29a0c5729fdbf5db
+cloneUbuntu/.git/objects/c8/
+cloneUbuntu/.git/objects/c8/939527c8d55c93e444f7c00db4986aec1d97e2
+cloneUbuntu/.git/objects/02/
+cloneUbuntu/.git/objects/02/557fa400393c2b8ccccff8564290a1ab1f355c
+cloneUbuntu/.git/objects/02/0ac9ae13b996da9b3f29cd5cf501784040a2b3
+cloneUbuntu/.git/objects/33/
+cloneUbuntu/.git/objects/33/2a47d6f81fb7b624e164c31eba8c34f861ceb6
+cloneUbuntu/.git/objects/22/
+cloneUbuntu/.git/objects/22/42fd0657a6ad5194d757f73e97e8384631f8d7
+cloneUbuntu/.git/objects/ce/
+cloneUbuntu/.git/objects/ce/b0e4c9be6bf8271d8db955e5313e09de957faf
+cloneUbuntu/.git/objects/e6/
+cloneUbuntu/.git/objects/e6/9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+cloneUbuntu/.git/config
+cloneUbuntu/.git/refs/
+cloneUbuntu/.git/refs/tags/
+cloneUbuntu/.git/refs/heads/
+cloneUbuntu/.git/refs/heads/master
+cloneUbuntu/.git/refs/remotes/
+cloneUbuntu/.git/refs/remotes/origin/
+cloneUbuntu/.git/refs/remotes/origin/HEAD
+cloneUbuntu/.git/description
+cloneUbuntu/dev
+cloneUbuntu/file1
+root@Leon-Ubuntu:/home/leon# ls
+cloneUbuntu  dOcean
+//	Verified below...
+root@Leon-Ubuntu:/home/leon# ls cloneUbuntu/
+dev  file1  gitPull.txt  README.md  sumPosTuple.py  Sum.py  work
+root@Leon-Ubuntu:/home/leon# 
+root@Leon-Ubuntu:/home/leon# cat cloneUbuntu/work/subject/subFile 
+This file is created with New File in GitHub with 
+file name being subject/subFile which will create
+a subdirectory subject under work along the way.
+root@Leon-Ubuntu:/home/leon# 
