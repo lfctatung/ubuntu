@@ -283,6 +283,27 @@ Unnamed repository; edit this file 'description' to name the repository.
        a whole.
 
 emily@Emily-Ubuntu:~/git/firstProj$ git add .
+
+// Note that without "git add" the file, "git commit" will not work:
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Commit first file" README 
+error: pathspec 'README' did not match any file(s) known to git.
+
+The fix:
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git add README 
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Commit first file" README 
+[master (root-commit) e4cb333] Commit first file
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch 
+* master
+It is important to have the push target refspec directory cloneUbuntu
+to have a branch by commiting a dummy file first to have a master 
+branch; else you get:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin cloneUbuntu
+error: src refspec cloneUbuntu does not match any.
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu'
+//
+
 emily@Emily-Ubuntu:~/git/firstProj$ 
 
 //Every time you make changes to files, you need to write a commit message.
