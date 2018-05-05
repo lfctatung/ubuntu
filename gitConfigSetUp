@@ -1118,3 +1118,120 @@ We can do "Pull Request" on GitHub, which will show diff of
 this additional file, to merge newBranch into master and 
 delete newBranch afterwards.
 	===========================================
+
+On DigitalOcean (DO server), we can turn it into a simple Git server with ssh:
+
+See https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server#_getting_git_on_a_server
+
+
+=================================
+On local: set up remote dorigin...
+=================================
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote remove doriginemily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote add dorigin root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote -v
+dorigin	root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu (fetch)
+dorigin	root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu (push)
+origin	https://github.com/lfctatung/ubuntu (fetch)
+origin	https://github.com/lfctatung/ubuntu (push)
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch 
+* master
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git commit .
+On branch master
+Your branch is ahead of 'origin/master' by 4 commits.
+  (use "git push" to publish your local commits)
+Untracked files:
+	my_project.git/
+
+nothing added to commit but untracked files present
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
+dev    gitConfigSetUp  gitPull.txt     README     sumPosTuple.py  work
+file1  gitDO           my_project.git  README.md  Sum.py
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls my_project.git/
+branches  config  description  HEAD  hooks  info  objects  packed-refs  refs
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master
+root@167.99.167.207's password: 
+Counting objects: 47, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (38/38), done.
+Writing objects: 100% (47/47), 15.35 KiB | 0 bytes/s, done.
+Total 47 (delta 16), reused 0 (delta 0)
+To root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+   e4cb333..6bde32e  master -> master
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
+dev    gitConfigSetUp  gitPull.txt     README     sumPosTuple.py  work
+file1  gitDO           my_project.git  README.md  Sum.py
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git show-ref
+6bde32e521efc758e934e382e07720648d6e4d1b refs/heads/master
+6bde32e521efc758e934e382e07720648d6e4d1b refs/remotes/dorigin/master
+49a8c004e3d293f4b5b6bba1c553d930fa986d20 refs/remotes/origin/HEAD
+49a8c004e3d293f4b5b6bba1c553d930fa986d20 refs/remotes/origin/master
+03e5fbad7663b9bfc4de89de0eae0d44905b4d12 refs/remotes/origin/newBranch
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
+* master
+  remotes/dorigin/master	//	dorigin only shows master branch
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/newBranch
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
+* master
+  remotes/dorigin/master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/newBranch
+// The first parameter to git push should be the name of the remote repository, the second is refspec (normally a branch).
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin dummy
+error: src refspec dummy does not match any.
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+//	needs to pull dummy branch to show it in "git branch -a"
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git pull dorigin dummy
+root@167.99.167.207's password: 
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 1), reused 0 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From 167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+ * branch            dummy      -> FETCH_HEAD
+ * [new branch]      dummy      -> dorigin/dummy	//	shows up
+Updating 6bde32e..a832f8c
+Fast-forward
+ READMEdummy | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 READMEdummy
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
+* master
+  remotes/dorigin/dummy //	Now dummy branch shows up!
+  remotes/dorigin/master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/newBranch
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
+dev    gitConfigSetUp  gitPull.txt     README       README.md       Sum.py
+file1  gitDO           my_project.git  READMEdummy  sumPosTuple.py  work
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+
+=================================
+On DO server:
+=================================
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git init
+
+root@Leon-Ubuntu:/home/leon/ubuntu# ll cloneUbuntu/
+total 16
+drwxr-sr-x 3 root root 4096 May  5 02:01 ./
+drwxrwsr-x 7 root root 4096 May  5 01:52 ../
+drwxr-sr-x 8 root root 4096 May  5 02:05 .git/
+-rw-r--r-- 1 root root   30 May  5 02:01 README
+root@Leon-Ubuntu:/home/leon/ubuntu# cd cloneUbuntu/
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# cat README 
+Create a dummy file to commit
+
+t@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git add README 
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Commit first file" README 
+[master (root-commit) e4cb333] Commit first file
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch 
+* master	//	After commit does it show.
