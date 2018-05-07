@@ -1316,6 +1316,84 @@ dev       gitDO           README          sumPosTuple.py
 file1     gitPull.txt     READMEdummy     Sum.py
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
 
+// To find out which branch is not checked out including remote...
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a --merged 
+* master
+  remotes/dorigin/dummy
+  remotes/dorigin/master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/newBranch
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a --no-merged 
+
+// To find out which branch is not checked out among remote branches...
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -r --merged 
+  dorigin/dummy
+  dorigin/master
+  origin/HEAD -> origin/master
+  origin/master
+  origin/newBranch
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git status 
+On branch master
+Your branch is ahead of 'origin/master' by 9 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	deleted:    .gitConfigSetUp.swp
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+If all checked out and you still cannot do:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master:master
+! [remote rejected] master -> master (branch is currently checked out)
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
+
+1. Pull and push again:
+
+git pull; git push
+
+2. Push into different branch:
+
+git push origin master:foo
+
+and merge it on remote (either by git or pull-request)
+
+git merge foo
+
+For example Option 2:
+//	Push local master to remote foo
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master:foo
+root@167.99.167.207's password: 
+Counting objects: 5, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 2.71 KiB | 0 bytes/s, done.
+Total 5 (delta 3), reused 0 (delta 0)
+To root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+ * [new branch]      master -> foo
+//	Merge foo into master on remote
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ll gitConfigSetUp*
+-rw-r--r-- 1 root root 52156 May  6 21:56 gitConfigSetUp	// old
+-rw-r--r-- 1 root root 52156 May  7 22:42 gitConfigSetUpOld
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git merge foo
+Updating 9c2f78e..9d4e20d
+Fast-forward
+ gitConfigSetUp | 209 +++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 175 insertions(+), 34 deletions(-)
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ll gitConfigSetUp*
+-rw-r--r-- 1 root root 58062 May  7 23:30 gitConfigSetUp	// new
+-rw-r--r-- 1 root root 52156 May  7 22:42 gitConfigSetUpOld
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# diff gitConfigSetUp gitConfigSetUpOld > junk
+
+t@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch -d foo
+Deleted branch foo (was 9d4e20d).	
+
 =================================
 On DO server Leon-Ubuntu:
 emily@Emily-Ubuntu:~$ ssh root@167.99.167.207
