@@ -1391,8 +1391,13 @@ root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ll gitConfigSetUp*
 -rw-r--r-- 1 root root 52156 May  7 22:42 gitConfigSetUpOld
 root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# diff gitConfigSetUp gitConfigSetUpOld > junk
 
-t@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch -d foo
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch -d foo
 Deleted branch foo (was 9d4e20d).	
+
+We can do the same thing to update GitHub ubuntu master branch by direct
+push to the master or foo first and Pull request to merge:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin 
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin master:foo
 
 =================================
 On DO server Leon-Ubuntu:
