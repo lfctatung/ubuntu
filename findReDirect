@@ -1,0 +1,23 @@
+
+See https://askubuntu.com/questions/635065/what-is-the-differences-between-and-21
+
+This construct allows both the standard output (file descriptor 1) and the standard error output (file descriptor 2) to be redirected to the file 
+
+//	1 goes to file result and 2 goes to stdout
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ find / -name gitPull.txt 2>&1> result
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ cat result 
+/home/emily/git/cloneProject/cloneUbuntu/gitPull.txt
+/home/emily/git/firstProj/gitPull.txt
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+
+//	1 goes to stdout and 2 goes to trash can
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ find / -name gitPull.txt 2> /dev/null
+/home/emily/git/cloneProject/cloneUbuntu/gitPull.txt
+/home/emily/git/firstProj/gitPull.txt
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+
+//	1 goes to result and 2 goes to leon, nothing on stdout display
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ find / -name gitPull.txt 2> leon 1> result
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ grep git result
+/home/emily/git/cloneProject/cloneUbuntu/gitPull.txt
+/home/emily/git/firstProj/gitPull.txt
