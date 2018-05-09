@@ -1,4 +1,26 @@
+===>>>	Push local src to update remote dst.
+
+We can do the same thing to update GitHub ubuntu master branch by direct
+push to the master or foo first and Pull request to merge (GitHub) or "git merge foo" (DigitalOcean):
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin 
+//	which may need to "git pull" first to sync, easier with...
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin master:foo
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git merge foo
+
+<<<===	Pull remote src to update local dst.
+
+In the opposite direction to update local, we pull origin master and merge.
+We first create a clone checkoutMaster in local to checkout the
+GitHub master branch:
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b checkoutMaster origin/master
+emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
+* checkoutMaster
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
+emily@Emily-Ubuntu:~/git/firstProj$ git merge checkoutMaster
+
 	--------------------------------------------------
+
 Difference between "git branch" and"git checkout -b":
 
 "man git-branch" git-branch - List, create, or delete branches
@@ -140,9 +162,9 @@ emily@Emily-Ubuntu:~/git/firstProj$ git push // "update remote"
 Meanwhile, we can pull changes from GitHub master to "update local master"
 
 emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
-//	git pull <remote> <local branch (if remote dst omitted)> or 
-		<local src branch:remote dst branch>
-	where branch (master in this case) is the local src branch
+//	git pull <remote> <src remote branch (if local dst omitted)> or 
+		<remote src branch:local dst branch>
+	where branch (master in this case) is the remote src branch
 //
 //	In .git/config:
 [remote "origin"]
@@ -168,7 +190,8 @@ $ git log remotes/origin/master
 $ git log refs/remotes/origin/master
 
 //	Regardless of pull/fetch or push issued from local, <refspec>:
-//	<local src? updated> : <from remote dst?> for pull <<<===
+//		Src	:	Dst
+//	<from remote src> : <local dst updated> for pull <<<===
 //	<from local src> : <remote dst updated> for push   ===>>>
 //	See https://git-scm.com/book/en/v2/Git-Internals-The-Refspec	
 Deleting References
@@ -194,8 +217,9 @@ Option 2:	Check out the remote master to local branch checkoutMaster
 emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b checkoutMaster origin/master Branch checkoutMaster set up to track remote branch master from origin.
 Switched to a new branch 'checkoutMaster'
 
-emily@Emily-Ubuntu:~/git/firstProj$ git checkout checkoutMaster 
-emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout checkoutMaster
+//	From remote master to local checkoutMaster 
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
 
 emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
 emily@Emily-Ubuntu:~/git/firstProj$ git merge checkoutMaster 
@@ -433,7 +457,7 @@ branch.master.merge=refs/heads/master
 Once you have a remote configured, you are now able to push your code.
 "git push" tells git that we want to push our changes, "origin" is the name of our newly-configured remote server and "master" is the name of the first branch.
 In the future, when you have commits that you want to push to the server, you can simply type "git push".
-emily@Emily-Ubuntu:~/git/firstProj$ git push(up) -u (to remote server name)origin (remote branch)master	<<<===
+emily@Emily-Ubuntu:~/git/firstProj$ git push(up) -u (to remote server name)origin (local branch)master	<<<===
 
 //	user.name=lfctatung; inherited from global level ~/git
 Username for 'https://github.com': lfctatung
@@ -609,7 +633,7 @@ Local
   688  git push	// to sync with remote master
 
 
-// Pull and Push are network commands to work with remote repository and branch
+// Pull and Push are network commands to work with remote repository and branches
 
 Suppose we created/committed a file gitPull.txt on GitHub repo: ubuntu master.
 We want to download to our local develop branch...
@@ -763,11 +787,6 @@ Your branch is behind 'origin/master' by 2 commits, and can be fast-forwarded.
   (use "git pull" to update your local branch)
 emily@Emily-Ubuntu:~/git/firstProj/work$ ls
 emily@Emily-Ubuntu:~/git/firstProj/work$ cd ..
-emily@Emily-Ubuntu:~/git/firstProj$ git branch -a
-* checkoutMaster
-  develop
-  master
-  remotes/origin/master
 emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
 remote: Counting objects: 5, done.
 remote: Compressing objects: 100% (4/4), done.
@@ -1161,7 +1180,8 @@ If we just want to add one file and push (sync) it to remote GitHub:
   659  git add gitConfigSetUp 
   660  git commit 
   662  git push origin<repository> newBranch<refspec> 
-// It will create a new remote newBranch under lfctatung/ubuntu. 
+// It will create a new remote newBranch (from local newBranch) 
+under lfctatung/ubuntu. 
 We can do "Pull Request" on GitHub, which will show diff of 
 this additional file, to merge newBranch into master and 
 delete newBranch afterwards.
@@ -1298,7 +1318,7 @@ emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy
  ! [remote rejected] HEAD -> dummy (branch is currently checked out)
 error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
 
-//	Once we commit dummy on the server, see below, 
+//	Once we commit dst dummy on the server, see Server below, 
 //	we're able to push local master to remote dummy branch.
 
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy
@@ -1454,7 +1474,10 @@ root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Dummy commit"
  create mode 100644 READMEdummy
 // master doesn't see READMEdummy, only dummy branch does.
 //	Once we commit dummy, we're able to push local to remote
-//After emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy, we see anyDummy.
+//After 
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy
+we see anyDummy.
+//
 root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ls
 anyDummy  gitConfigSetUp  my_project.git  README.md       work
 dev       gitDO           README          sumPosTuple.py

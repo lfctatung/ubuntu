@@ -137,11 +137,55 @@ Your branch is ahead of 'origin/master' by 2 commits.
 emily@Emily-Ubuntu:~/git/firstProj$ git push // "update remote"
 // Verified that file "dev" showed up on the GitHub ubuntu/master branch
 
-Meanwhile, we can pull changes from GitHub master to "update local"
+Meanwhile, we can pull changes from GitHub master to "update local master"
 
 emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
-//	git pull <remote> <branch> 
-//	where branch (master in this case) is the remote source branch
+//	git pull <remote> <src remote branch (if local dst omitted)> or 
+		<remote src branch:local dst branch>
+	where branch (master in this case) is the remote src branch
+//
+//	In .git/config:
+[remote "origin"]
+        url = https://github.com/lfctatung/ubuntu.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+//	If you have a QA team that pushes a series of branches, and you want to get the master branch and any of the QA team’s branches but nothing else, you can use a config section like this:
+	fetch = +refs/heads/master:refs/remotes/origin/master
+	fetch = +refs/heads/qa/*:refs/remotes/origin/qa/*
+//	If the QA team wants to push their master branch to qa/master on the remote server, they can run
+$ git push origin master:refs/heads/qa/master
+//
+
+[remote "origin"]
+	url = https://github.com/schacon/simplegit-progit
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	push = refs/heads/master:refs/heads/qa/master
+Again, this will cause a git push origin to push the local master branch to the remote qa/master branch by default.
+//
+//	If there is a master branch on the server, 
+you can access the log of that branch locally via any of the following:
+$ git log origin/master
+$ git log remotes/origin/master
+$ git log refs/remotes/origin/master
+
+//	Regardless of pull/fetch or push issued from local, <refspec>:
+//		Src	:	Dst
+//	<from remote src> : <local dst updated> for pull <<<===
+//	<from local src> : <remote dst updated> for push   ===>>>
+//	See https://git-scm.com/book/en/v2/Git-Internals-The-Refspec	
+Deleting References
+
+You can also use the refspec to delete references from the remote server by running something like this:
+
+$ git push origin :topic
+
+Because the refspec is <src>:<dst>, by leaving off the <src> part, this basically says to make the topic branch on the remote nothing, which deletes it.
+
+Or you can use the newer syntax (available since Git v1.7.0):
+
+$ git push origin --delete topic
+
+//
+
 
 Option 2:	Check out the remote master to local branch checkoutMaster 
 	which is newly created with -b.  See "man git-checkout"
@@ -151,8 +195,9 @@ Option 2:	Check out the remote master to local branch checkoutMaster
 emily@Emily-Ubuntu:~/git/firstProj$ git checkout -b checkoutMaster origin/master Branch checkoutMaster set up to track remote branch master from origin.
 Switched to a new branch 'checkoutMaster'
 
-emily@Emily-Ubuntu:~/git/firstProj$ git checkout checkoutMaster 
-emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master 
+emily@Emily-Ubuntu:~/git/firstProj$ git checkout checkoutMaster
+//	From remote master to local checkoutMaster 
+emily@Emily-Ubuntu:~/git/firstProj$ git pull origin master
 
 emily@Emily-Ubuntu:~/git/firstProj$ git checkout master
 emily@Emily-Ubuntu:~/git/firstProj$ git merge checkoutMaster 
@@ -296,10 +341,9 @@ root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Commit first file
  create mode 100644 README
 root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch 
 * master
-It is important to have the push target refspec directory cloneUbuntu
-to have a branch by commiting a dummy file first to have a master 
-branch; else you get:
-emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin cloneUbuntu
+It is important to have the push target refspec cloneUbuntu/master
+to have a master branch by commiting a dummy file first; else you get:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin cloneUbuntu/master
 error: src refspec cloneUbuntu does not match any.
 error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu'
 //
@@ -953,6 +997,12 @@ emily@Emily-Ubuntu:~/git/cloneProject$ git commit -m 'cloneProject commit'
  create mode 100644 dOcean
 emily@Emily-Ubuntu:~/git/cloneProject$ git branch -a
 * master	// Now master is there.
+
+This is evident in creating the "hello-world" or "ubuntu" proj/directory 
+in GitHub where a file called README.md was first created.
+
+Any other branches after master can be created by either 
+"git branch newBranch" or "git checkout -b newBranch"
 	-------------------------------------------
 
 //	We will tar cloneUbuntu dir. into a tar file called dOcean
@@ -1119,15 +1169,19 @@ this additional file, to merge newBranch into master and
 delete newBranch afterwards.
 	===========================================
 
-On DigitalOcean (DO server), we can turn it into a simple Git server with ssh:
+On DigitalOcean (DO server), we can turn it into a Git server with ssh:
 
 See https://git-scm.com/book/en/v2/Git-on-the-Server-Getting-Git-on-a-Server#_getting_git_on_a_server
 
 
-=================================
-On local: set up remote dorigin...
-=================================
-emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote remove doriginemily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote add dorigin root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+	=================================
+On local Emily-Ubuntu: set up remote dorigin...
+	=================================
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote remove dorigin
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote add dorigin 
+root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git remote -v
 dorigin	root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu (fetch)
 dorigin	root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu (push)
@@ -1144,9 +1198,11 @@ Untracked files:
 	my_project.git/
 
 nothing added to commit but untracked files present
+
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
 dev    gitConfigSetUp  gitPull.txt     README     sumPosTuple.py  work
 file1  gitDO           my_project.git  README.md  Sum.py
+
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls my_project.git/
 branches  config  description  HEAD  hooks  info  objects  packed-refs  refs
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master
@@ -1158,10 +1214,7 @@ Writing objects: 100% (47/47), 15.35 KiB | 0 bytes/s, done.
 Total 47 (delta 16), reused 0 (delta 0)
 To root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
    e4cb333..6bde32e  master -> master
-emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
-dev    gitConfigSetUp  gitPull.txt     README     sumPosTuple.py  work
-file1  gitDO           my_project.git  README.md  Sum.py
-emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git show-ref
 6bde32e521efc758e934e382e07720648d6e4d1b refs/heads/master
 6bde32e521efc758e934e382e07720648d6e4d1b refs/remotes/dorigin/master
@@ -1174,19 +1227,23 @@ emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
   remotes/origin/HEAD -> origin/master
   remotes/origin/master
   remotes/origin/newBranch
+
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
 * master
-  remotes/dorigin/master
+  remotes/dorigin/master	//	dorigin only shows master branch
   remotes/origin/HEAD -> origin/master
   remotes/origin/master
   remotes/origin/newBranch
+
 // The first parameter to git push should be the name of the remote repository, the second is refspec (normally a branch).
 
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin dummy
 error: src refspec dummy does not match any.
 error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
-//	needs to pull dummy branch to show it in "git branch -a"
+/////////////////////////////////////////
+// git pull down dummy branch first to show it as a remote branch
+/////////////////////////////////////////
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git pull dorigin dummy
 root@167.99.167.207's password: 
 remote: Counting objects: 3, done.
@@ -1195,7 +1252,7 @@ remote: Total 3 (delta 1), reused 0 (delta 0)
 Unpacking objects: 100% (3/3), done.
 From 167.99.167.207:/home/leon/ubuntu/cloneUbuntu
  * branch            dummy      -> FETCH_HEAD
- * [new branch]      dummy      -> dorigin/dummy	//	shows up
+ * [new branch]      dummy      -> dorigin/dummy	// dummy shows up
 Updating 6bde32e..a832f8c
 Fast-forward
  READMEdummy | 0
@@ -1203,35 +1260,204 @@ Fast-forward
  create mode 100644 READMEdummy
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a
 * master
-  remotes/dorigin/dummy //	Now dummy branch shows up!
+  remotes/dorigin/dummy 	//	Now dummy branch shows up!
   remotes/dorigin/master
   remotes/origin/HEAD -> origin/master
   remotes/origin/master
   remotes/origin/newBranch
-emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
-dev    gitConfigSetUp  gitPull.txt     README       README.md       Sum.py
-file1  gitDO           my_project.git  READMEdummy  sumPosTuple.py  work
 emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
 
-=================================
-On DO server:
-=================================
-root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git init
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ touch anyDummy
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git commit -m "anyDummy"
+On branch master
+Your branch is ahead of 'origin/master' by 5 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+	modified:   gitConfigSetUp
 
-root@Leon-Ubuntu:/home/leon/ubuntu# ll cloneUbuntu/
-total 16
-drwxr-sr-x 3 root root 4096 May  5 02:01 ./
-drwxrwsr-x 7 root root 4096 May  5 01:52 ../
-drwxr-sr-x 8 root root 4096 May  5 02:05 .git/
--rw-r--r-- 1 root root   30 May  5 02:01 README
+Untracked files:
+	.gitConfigSetUp.swp
+	anyDummy
+	my_project.git/
+
+no changes added to commit
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin dummy
+error: src refspec dummy does not match any.
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
+//	
+The syntax you're using for git push includes a refspec (new_branch:new_branch). Refspecs are always in the form source:destination, so the error is telling you that something's wrong with the source part of your refspec.
+//
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
+anyDummy  gitConfigSetUp  my_project.git  README.md       work
+dev       gitDO           README          sumPosTuple.py
+file1     gitPull.txt     READMEdummy     Sum.py
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git add .
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git commit 
+[master 9e3d8d5] anyDummy push
+....
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy
+ ! [remote rejected] HEAD -> dummy (branch is currently checked out)
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
+
+//	Once we commit dummy on the server, see below, 
+//	we're able to push local master to remote dummy branch.
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy
+root@167.99.167.207's password: 
+Counting objects: 96, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (92/92), done.
+Writing objects: 100% (96/96), 56.62 KiB | 0 bytes/s, done.
+Total 96 (delta 7), reused 0 (delta 0)
+To root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+   a832f8c..9e3d8d5  HEAD -> dummy
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ ls
+anyDummy  gitConfigSetUp  my_project.git  README.md       work
+dev       gitDO           README          sumPosTuple.py
+file1     gitPull.txt     READMEdummy     Sum.py
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ 
+
+// To find out which branch is not checked out including remote...
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a --merged 
+* master
+  remotes/dorigin/dummy
+  remotes/dorigin/master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/newBranch
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -a --no-merged 
+
+// To find out which branch is not checked out among remote branches...
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git branch -r --merged 
+  dorigin/dummy
+  dorigin/master
+  origin/HEAD -> origin/master
+  origin/master
+  origin/newBranch
+
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git status 
+On branch master
+Your branch is ahead of 'origin/master' by 9 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	deleted:    .gitConfigSetUp.swp
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+If all checked out and you still cannot do:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master:master
+! [remote rejected] master -> master (branch is currently checked out)
+error: failed to push some refs to 'root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu'
+
+1. Pull and push again:
+
+git pull; git push
+
+2. Push into different branch:
+
+git push origin master:foo
+
+and merge it on remote (either by git or pull-request)
+
+git merge foo
+
+For example Option 2:
+//	Push local master to remote foo
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin master:foo
+root@167.99.167.207's password: 
+Counting objects: 5, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (5/5), done.
+Writing objects: 100% (5/5), 2.71 KiB | 0 bytes/s, done.
+Total 5 (delta 3), reused 0 (delta 0)
+To root@167.99.167.207:/home/leon/ubuntu/cloneUbuntu
+ * [new branch]      master -> foo
+//	Merge foo into master on remote
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ll gitConfigSetUp*
+-rw-r--r-- 1 root root 52156 May  6 21:56 gitConfigSetUp	// old
+-rw-r--r-- 1 root root 52156 May  7 22:42 gitConfigSetUpOld
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git merge foo
+Updating 9c2f78e..9d4e20d
+Fast-forward
+ gitConfigSetUp | 209 +++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 175 insertions(+), 34 deletions(-)
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ll gitConfigSetUp*
+-rw-r--r-- 1 root root 58062 May  7 23:30 gitConfigSetUp	// new
+-rw-r--r-- 1 root root 52156 May  7 22:42 gitConfigSetUpOld
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# diff gitConfigSetUp gitConfigSetUpOld > junk
+
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch -d foo
+Deleted branch foo (was 9d4e20d).	
+
+We can do the same thing to update GitHub ubuntu master branch by direct
+push to the master or foo first and Pull request to merge:
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin 
+emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push origin master:foo
+
+=================================
+On DO server Leon-Ubuntu:
+emily@Emily-Ubuntu:~$ ssh root@167.99.167.207
+=================================
+
+root@Leon-Ubuntu:/home/leon# git config --global user.name "lfctatung"
+root@Leon-Ubuntu:/home/leon# git config --global user.email "lfctatung@gmail.com"
+root@Leon-Ubuntu:/home/leon# cat /root/.gitconfig
+[user]
+	name = lfctatung
+	email = lfctatung@gmail.com
+root@Leon-Ubuntu:/home/leon# mkdir ubuntu
+root@Leon-Ubuntu:/home/leon# ls
+cloneUbuntu  dOcean  ubuntu
+root@Leon-Ubuntu:/home/leon# cd ubuntu/
+root@Leon-Ubuntu:/home/leon/ubuntu# ls
+root@Leon-Ubuntu:/home/leon/ubuntu# git init --bare --shared
+Initialized empty shared Git repository in /home/leon/ubuntu/
+root@Leon-Ubuntu:/home/leon/ubuntu# mkdir cloneUbuntu
 root@Leon-Ubuntu:/home/leon/ubuntu# cd cloneUbuntu/
-root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# cat README 
-Create a dummy file to commit
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git init
+Initialized empty Git repository in /home/leon/ubuntu/cloneUbuntu/.git/
 
-t@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git add README 
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch 
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# echo "Create a dummy file to commit" >>README
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git add README 
 root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Commit first file" README 
 [master (root-commit) e4cb333] Commit first file
  1 file changed, 1 insertion(+)
  create mode 100644 README
 root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch 
-* master	//	After commit does it show.
+* master	//	After commit the master branch is up.
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ls
+dev    gitConfigSetUp  gitPull.txt  READMEdummy  sumPosTuple.py  work
+file1  gitDO           README       README.md    Sum.py
+
+
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git checkout -b dummy
+Switched to a new branch 'dummy'
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git branch -a
+* dummy
+  master
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ls
+dev    gitConfigSetUp  gitPull.txt  README.md       Sum.py
+file1  gitDO           README       sumPosTuple.py  work
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# touch READMEdummy
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git add READMEdummy
+
+
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# git commit -m "Dummy commit"
+[dummy a832f8c] Dummy commit
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 READMEdummy
+// master doesn't see READMEdummy, only dummy branch does.
+//	Once we commit dummy, we're able to push local to remote
+//After emily@Emily-Ubuntu:~/git/cloneProject/cloneUbuntu$ git push dorigin HEAD:dummy, we see anyDummy.
+root@Leon-Ubuntu:/home/leon/ubuntu/cloneUbuntu# ls
+anyDummy  gitConfigSetUp  my_project.git  README.md       work
+dev       gitDO           README          sumPosTuple.py
+file1     gitPull.txt     READMEdummy     Sum.py
