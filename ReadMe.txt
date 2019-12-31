@@ -177,12 +177,6 @@ To https://github.com/lfctatung/ubuntu
 
 C:\Users\leochang\Documents\Leon\ubuntu>git merge master master
 Already up to date.
-C:\Users\leochang\Documents\Leon\ubuntu>git checkout -b branch2
-Switched to a new branch 'branch2'
-
-C:\Users\leochang\Documents\Leon\ubuntu>git branch
-* branch2
-  master
 
 // grep (findstr) the "git " commands to see their command sequence 
 // in this ReadMe.txt file...
@@ -210,6 +204,16 @@ C:\Users\leochang\Documents\Leon\ubuntu>git commit *
     git config --global --edit
     git commit --amend --reset-author
 	      ======================================================
+		  
+// "git branch branch2" to create a new branch 
+// followed by "git checkout branche2" to checkout		  
+C:\Users\leochang\Documents\Leon\ubuntu>git checkout -b branch2
+Switched to a new branch 'branch2'
+
+C:\Users\leochang\Documents\Leon\ubuntu>git branch
+* branch2
+  master
+
 C:\Users\leochang\Documents\Leon\ubuntu>git branch -a
 * branch2
   master
@@ -232,10 +236,86 @@ Changes not staged for commit:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 
-C:\Users\leochang\Documents\Leon\ubuntu>
 C:\Users\leochang\Documents\Leon\ubuntu>git remote
 origin
 
+C:\Users\leochang\Documents\Leon\ubuntu>git add ReadMe.txt	// Add to the branch robust
+warning: LF will be replaced by CRLF in ReadMe.txt.
+The file will have its original line endings in your working directory
+
+C:\Users\leochang\Documents\Leon\ubuntu>git status
+On branch robust
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   ReadMe.txt
+
+
+C:\Users\leochang\Documents\Leon\ubuntu>git commit * 
+warning: LF will be replaced by CRLF in ReadMe.txt.
+The file will have its original line endings in your working directory
+Aborting commit due to empty commit message.
+
+			//	Commit to the current branch "robust" pointer
+			
+C:\Users\leochang\Documents\Leon\ubuntu>git commit -m "ReadMe.txt modified and added to branch robust" *
+warning: LF will be replaced by CRLF in ReadMe.txt.
+The file will have its original line endings in your working directory
+[robust 57b5c4a] ReadMe.txt modified and added to branch robust
+ 1 file changed, 241 insertions(+)
+
+C:\Users\leochang\Documents\Leon\ubuntu>git push master
+fatal: 'master' does not appear to be a git repository
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+
+C:\Users\leochang\Documents\Leon\ubuntu>git push
+fatal: The current branch robust has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream origin robust
+
+C:\Users\leochang\Documents\Leon\ubuntu>git push --set-upstream origin robust
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 2.31 KiB | 2.31 MiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+remote:
+remote: Create a pull request for 'robust' on GitHub by visiting:
+remote:      https://github.com/lfctatung/ubuntu/pull/new/robust
+remote:
+To https://github.com/lfctatung/ubuntu
+ * [new branch]      robust -> robust
+Branch 'robust' set up to track remote branch 'robust' from 'origin'.
+
+C:\Users\leochang\Documents\Leon\ubuntu>git push
+Everything up-to-date
+
 C:\Users\leochang\Documents\Leon\ubuntu>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
